@@ -1,4 +1,3 @@
-from tkinter import *
 import requests
 
 #ключ openweather
@@ -45,11 +44,10 @@ def getDict (data):
 # получить погоду на день
 def getWeatherDay():
     try:
-        city = cityField.get()
         weather = getDict(requests.get('http://api.openweathermap.org/data/2.5/weather',
                             params={'APPID': key, 'q': city, 'units': 'metric', 'lang': 'en'}).json())
         # Полученные данные добавляем в текстовую надпись для отображения пользователю
-        info['text'] = f"{weather['s_city']} weather information."
+        weatherLabel['text'] = f"{weather['s_city']} weather information."
         weatherLabel['text'] = f"In {weather['s_city']} {weather['desc']} today\n" \
                                f"Temperature {weather['temp']} °C\n" \
                                f"Wind speed {weather['windSpeed']} m/s\n" \
@@ -63,54 +61,24 @@ def getWeatherDay():
 # получить погоду на неделю
 def getWeatherWeek():
     try:
-        city = cityField.get()
         weather = getDict(requests.get('http://api.openweathermap.org/data/2.5/forecast',
                                        params={'APPID': key, 'q': city, 'units': 'metric', 'lang': 'en'}).json())
         weatherLabel['text'] = ""
 
         for i in weather.keys():
-            info['text'] = f"{weather[i]['s_city']} weather information."
             weatherLabel['text'] += f"{weather[i]['date'][:10]}:                      \n" \
                                     f"{weather[i]['main']}, {weather[i]['temp']} °C\n" \
                                     f"{weather[i]['windSpeed']} m/s, {weather[i]['visibility']} m\n\n"
     except:
         weatherLabel['text'] = "Weather not found"
 
-# Настройки главного окна tKinter
-root = Tk()
-root.title('Weather forecast')
-root.geometry('350x580')
-root.resizable(width=False, height=False)
+weatherLabel= {
+    'text':'',
+}
 
-# настройки интерфейса
-menuSize = 0.26
-colorTop = '#00b8b9'
-colorBot = '#00b8d9'
-colorLight = '#00b8e9'
-colorBtActBg ="#00b8a1"
-fontMain = "Helvetica 10"
-btnWidth = 15
+city = input("Введите город")
+getWeatherDay()
+print(f"Погода на день: {weatherLabel['text']}")
 
-# фрейм
-frame_top = Frame(root, bg=colorTop, bd=0)
-frame_top.place(relwidth=1, relheight=menuSize)
-frame_bottom = Frame(root, bg=colorBot, bd=0)
-frame_bottom.place(rely=menuSize, relwidth=1, relheight=1 - menuSize)
-
-# поле ввода
-cityField = Entry(frame_top, bg=colorLight, font="Helvetica 15", width=24)
-cityField.pack(pady=20)
-
-# кнопки
-btn = Button(frame_top, text='Weather for today', command=getWeatherDay, bg=colorLight, font=fontMain, activebackground=colorBtActBg, width=btnWidth)
-btn.pack(pady=0)
-btn2 = Button(frame_top, text='Weather for the week', command=getWeatherWeek, bg=colorLight, font=fontMain, activebackground=colorBtActBg, width=btnWidth)
-btn2.pack(pady=10)
-
-# текст
-info = Label(frame_bottom, text='Enter a city to search for weather',fg="#ffffff", bg=colorBot, font="Helvetica 12")
-info.pack(pady=10)
-weatherLabel = Label(frame_bottom, justify=LEFT, text='Weather information',fg="#ffffff", bg=colorBot, font="Helvetica 12")
-weatherLabel.pack(pady=0)
-
-root.mainloop()
+getWeatherWeek()
+print(f"Погода на неделю: {weatherLabel['text']}")
